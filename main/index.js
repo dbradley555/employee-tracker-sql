@@ -5,9 +5,9 @@ require('dotenv').config();
 
 const db = mysql.createConnection({
   host: 'localhost',
-  user: env.DB_USER,
-  password: env.DB_PASSWORD,
-  database: env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 const initialQuestion = {
@@ -40,9 +40,10 @@ const updateEmployeeRoleQuestions = [
       'Please enter the last name of the employee you would like to update: ',
   },
   {
-    type: 'input',
+    type: 'list',
     name: 'employeenewrole',
     message: 'Please enter the new role: ',
+    choices: `${getRoles()}`,
   },
 ];
 
@@ -61,13 +62,13 @@ const addEmployeeQuestions = [
     type: 'list',
     name: 'jobtitle',
     message: "What is the employee's role? ",
-    choices: getRoles(),
+    choices: `${getRoles()}`,
   },
   {
     type: 'list',
     name: 'manager',
     message: "Who is the employee's manager?",
-    choices: getManagers(),
+    choices: `${getManagers()}`,
   },
 ];
 
@@ -94,7 +95,7 @@ const addRoleQuestion = [
     type: 'list',
     name: 'roledepartment',
     message: 'What department does the role belong to?',
-    choices: getDepartments(),
+    choices: `${getDepartments()}`,
   },
 ];
 
@@ -127,7 +128,11 @@ function viewEmployees() {
   const sql =
     'SELECT employee.first_name AS First Name, employee.last_name AS Last Name, role.title AS Title, department.name AS Department, role.salary AS Salary, employee.manager_id AS Manager FROM employee JOIN ';
   db.query(sql, (err, result) => {
-    console.table(result);
+    if (err) {
+      console.log(err);
+    } else {
+      cTable(result);
+    }
   });
 
   init();
@@ -154,8 +159,8 @@ function viewAllRoles() {
   const sql = 'SELECT role.title AS Titles FROM role';
   db.query(sql, (err, result) => {
     console.table(result);
+    init();
   });
-  init();
 }
 
 function addRole() {
@@ -168,11 +173,12 @@ function addRole() {
 }
 function viewDepartments() {
   // show table in console with all departments
-  const sql = 'SELECT name AS Departments FROM department';
+  const sql =
+    'SELECT department.department_name AS Departments FROM department';
   db.query(sql, (err, result) => {
     console.table(result);
+    init();
   });
-  init();
 }
 function addDepartment() {
   inquirer.prompt(addDepartmentQuestion).then((data) => {
@@ -210,3 +216,5 @@ function getRoles() {
     return roleArray;
   });
 }
+
+init();
