@@ -130,8 +130,6 @@ function viewEmployees() {
     .query(sql)
     .then((results) => console.table(results[0]))
     .then(() => init());
-
-  // init();
 }
 
 function addEmployee() {
@@ -153,10 +151,10 @@ function updateRole() {
 function viewAllRoles() {
   // show table in console with all roles
   const sql = 'SELECT role.title AS Titles FROM role';
-  db.query(sql, (err, result) => {
-    console.table(result);
-    init();
-  });
+  db.promise()
+    .query(sql)
+    .then((results) => console.table(results[0]))
+    .then(() => init());
 }
 
 function addRole() {
@@ -169,7 +167,11 @@ function addRole() {
 }
 function viewDepartments() {
   // show table in console with all departments
-  getDepartments().then((results) => console.table(results[0]));
+  const sql = 'SELECT department_name FROM department';
+  db.promise()
+    .query(sql)
+    .then((results) => console.table(results[0]))
+    .then(() => init());
 }
 
 function addDepartment() {
