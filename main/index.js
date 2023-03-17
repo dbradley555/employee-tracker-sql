@@ -124,16 +124,14 @@ function questionLoop(data) {
 function viewEmployees() {
   // show table in console with info about all employees
   const sql =
-    'SELECT employee.first_name AS First Name, employee.last_name AS Last Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary, employee.manager_id AS Manager FROM employee JOIN ';
-  db.query(sql, (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      cTable(result);
-    }
-  });
+    "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name AS department, role.salary, CONCAT (m.first_name, ' ', m.last_name) AS manager FROM employee LEFT JOIN role ON role.id=employee.role_id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee m ON employee.manager_id = m.id";
 
-  init();
+  db.promise()
+    .query(sql)
+    .then((results) => console.table(results[0]))
+    .then(() => init());
+
+  // init();
 }
 
 function addEmployee() {
