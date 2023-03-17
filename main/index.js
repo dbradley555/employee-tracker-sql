@@ -10,6 +10,8 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
+// getDepartments();
+// getRoles();
 const initialQuestion = {
   type: 'list',
   name: 'initialanswer',
@@ -95,13 +97,9 @@ const addRoleQuestion = [
     type: 'list',
     name: 'roledepartment',
     message: 'What department does the role belong to?',
-    choices: `${getDepartments()}`,
+    choices: ['departmentArray'],
   },
 ];
-
-function init() {
-  inquirer.prompt(initialQuestion).then((data) => questionLoop(data));
-}
 
 function questionLoop(data) {
   if (data.initialanswer === 'View All Employees') {
@@ -126,7 +124,7 @@ function questionLoop(data) {
 function viewEmployees() {
   // show table in console with info about all employees
   const sql =
-    'SELECT employee.first_name AS First Name, employee.last_name AS Last Name, role.title AS Title, department.name AS Department, role.salary AS Salary, employee.manager_id AS Manager FROM employee JOIN ';
+    'SELECT employee.first_name AS First Name, employee.last_name AS Last Name, role.title AS Title, department.department_name AS Department, role.salary AS Salary, employee.manager_id AS Manager FROM employee JOIN ';
   db.query(sql, (err, result) => {
     if (err) {
       console.log(err);
@@ -173,30 +171,33 @@ function addRole() {
 }
 function viewDepartments() {
   // show table in console with all departments
-  const sql =
-    'SELECT department.department_name AS Departments FROM department';
-  db.query(sql, (err, result) => {
-    console.table(result);
-    init();
-  });
+  getDepartments().then((results) => console.table(results[0]));
 }
+
 function addDepartment() {
   inquirer.prompt(addDepartmentQuestion).then((data) => {
     // add department to the table of departments
-
-    viewDepartments();
-    init();
+    const sql = `INSERT INTO department (department_name) VALUES ('${data.departmentname}')`;
+    db.query(sql, (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(`Successfully added ${data.departmentname} to the table.`);
+        viewDepartments();
+        init();
+      }
+    });
   });
 }
 
 function getDepartments() {
   // get list of departments from table
-  const sql = 'SELECT name FROM department';
-  db.query(sql, (err, result) => {
-    const departmentArray = new Array(result);
-    return departmentArray;
-  });
+  const sql = 'SELECT department_name FROM department';
+
+  return db.promise().query(sql);
 }
+
+// getDepartments();
 
 function getManagers() {
   // get list of employees that are in leadership role
@@ -212,9 +213,13 @@ function getRoles() {
   // get list of available roles
   const sql = 'SELECT title AS Title FROM role';
   db.query(sql, (err, result) => {
-    const roleArray = new Array(result);
+    roleArray = result;
     return roleArray;
   });
 }
+// console.log(roleArray, departmentArray);
 
+function init() {
+  inquirer.prompt(initialQuestion).then((response) => questionLoop(response));
+}
 init();
