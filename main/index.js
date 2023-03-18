@@ -186,7 +186,7 @@ function updateEmployeeRole() {
               .query(sql)
               .then(() => {
                 console.log(
-                  `${data.employeefirstname} ${data.employeelastname}'s role updated to ${employeenewrole}`
+                  `${data.employeefirstname} ${data.employeelastname}'s role updated to ${data.employeenewrole}`
                 );
               })
               .then(() => {
