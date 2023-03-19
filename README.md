@@ -4,7 +4,7 @@
 
 ## Description
 
-This application will accept team information input from the user in the terminal and will generate a webpage that displays your team's information.
+This application will create a database with employee information that you can manage through the terminal.
 
 ## Table of Contents
 
